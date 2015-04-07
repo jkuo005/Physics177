@@ -19,11 +19,6 @@ int_counter = 0     #Dummy Integer
 
 range_T = 0.0       #dummy variable for plotting later
 
-
-
-#plot
-t_v = plt.plot(111)
-
 #User input
 print "Positive direction for velocity is the same as gravity (downwards). "
 v_min = input("Enter minimum velocity [meters per second]: ")
@@ -37,34 +32,42 @@ v_seg  = (( v_max - v_min ) / 10.)
 print "Velocity segment is ", v_seg, "m/s"
 print " "
 
-while (int_counter <= 10):
-    #Initial velocity    
-    v_init = ( v_min + ( float(int_counter) * v_seg ))
-    print "When initial velocity is", v_init, "m/s"
-    
-    #Quadratic Formula
-    var_Root = np.sqrt( pow(v_init,2) + ( 2. * cons_G * cons_H ) )
-    
-    #Time elapsed
-    var_T = (( 1. / cons_G ) * ( -(v_init) + var_Root ))
-    print "It takes ", t, "seconds for the object to reach the ground."
-    
-    if (int_counter < 1):
-        range_T = var_T
-    
-    #Integer Counter
-    int_counter = int_counter + 1
-    print " "
-    
-    #Plotting
-    plt.plot(v_init, var_T, 'bo')
-    plt.gray()
+if (v_seg < 0):
+    print "Computational Error!!!"
+    print "Please make sure Max Velocity > Min Velocity!"
 
-#Naming Title and Axis
-plt.title("Time vs Velocity")
-plt.xlabel("Initial Velocity [m/s]")
-plt.ylabel("Time [s]")
-plt.show
+else:
+    while (int_counter <= 10):
+        #Initial velocity    
+        v_init = ( v_min + ( float(int_counter) * v_seg ))
+        print "When initial velocity is", v_init, "m/s"
+    
+        #Quadratic Formula
+        var_Root = np.sqrt( pow(v_init,2) + ( 2. * cons_G * cons_H ) )
+    
+        #Time elapsed
+        var_T = (( 1. / cons_G ) * ( -(v_init) + var_Root ))
+        print "It takes ", var_T, "seconds for the object to reach the ground."
+    
+        if (int_counter < 1):
+            range_T = var_T
+    
+        #Integer Counter
+        int_counter = int_counter + 1
+        print " "
+    
+        #Plotting
+        plt.plot(v_init, var_T, 'bo')
+        plt.gray()
 
-#Adjusting range
-plt.ylim([0,range_T])
+    #Naming Title and Axis
+    plt.title("T(V)")
+    plt.xlabel("Initial Velocity [m/s]")
+    plt.ylabel("Time [s]")
+    plt.show
+
+    #Adjusting range
+    plt.ylim([0,range_T])
+
+    #Printing Image
+    plt.savefig('Time as a function of Velocity.png', format = 'png')
