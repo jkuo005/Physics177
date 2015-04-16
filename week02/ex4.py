@@ -105,7 +105,7 @@ while (comparisonI != comparisonC):
     else:
         print "Target accuracy reached at N =", N + 1, "slices."
 
-print 'Regular Trapezoidal = ', I2
+print 'Regular Trapezoidal = ', I1
 print 'Adaptive Trapezoidal = ', I
 print 'Error = ', E
 print 'Corrected Integral Result = ', CI
