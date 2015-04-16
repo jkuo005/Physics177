@@ -58,8 +58,8 @@ while (comparisonI != comparisonC):
     #reset the variables
     I1 = 0.0        #trapezoidal integral
     I2 = 0.0        #second part of adaptive integral
-    I = 0.0         #final integral (I = 0.5*I1 + I2)
-    E = 0.0         #error (E = (1./3.)*(I - I1))
+    I  = 0.0        #final integral (I = 0.5*I1 + I2)
+    E  = 0.0        #error (E = (1./3.)*(I - I1))
     CI = 0.0        #corrected integral (I - E)
 
     #Integration
@@ -100,18 +100,17 @@ while (comparisonI != comparisonC):
     
     N = N / 2
     if (comparisonI != comparisonC):
-        N = N + 1
+        N = N * 2
 
     else:
-        print "Target accuracy reached at N =", N, "slices."
+        print "Target accuracy reached at N =", N + 1, "slices."
 
-print 'Regular Trapezoidal: ', I2
-print 'Adaptive Trapezoidal: ', I
-print 'Error: ', E
-print 'Corrected Integral Result: ', CI
-
+print 'Regular Trapezoidal = ', I2
+print 'Adaptive Trapezoidal = ', I
+print 'Error = ', E
+print 'Corrected Integral Result = ', CI
 
 """
 Note:
-N is roughly 1600 - 2000 for 6th decimal place estimation.
+N is roughly 2000 - 2100 for 6th decimal place estimation.
 """
