@@ -215,6 +215,7 @@ if (y_n == 'Y'):
     print "The scipy Romberg's output accuracy was based on absolute/relative "
     print "tolerance of 1.48e-08%, hence the different evalutions. Though the "
     print "calculated values remains similar, if not the same."
+    print "Try input the 11th decimal place accuracy for the exact evaluation."
 #################
 # Comment:
 # I've been playing around with the scipy's tol (absolute tolerance) and 
