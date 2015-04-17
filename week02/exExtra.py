@@ -30,7 +30,10 @@ CI = 0.0         #corrected integral (I - E)
 Ra = 0.0         #Romberg's Technique, first integral
 Rb = 0.0         #Romberg's Technique, second integral
 R  = 0.0         #Romberg's Technique, Next integral
-matrixR = np.zeros((10,10)) #Matrix for Romberg's Technique
+matrixR = np.zeros((2,2)) #Matrix for Romberg's Technique
+matrixE = np.zeros((2,2)) #Matrix for Romberg's error estimation
+
+matrixDummy = np.zeros((1,1)) #
 
 comparisonI = 0 #integer dummy for comparison
 comparisonC = 5 #integer dummy for comparison
@@ -53,7 +56,7 @@ b = 1
 """
 #Expected decimal place for Approximate Accuracy input
 
-print "For accuracy decimal place, it is highly suggested not to exceed 6!"
+print "For accuracy decimal place, it is highly suggested not to exceed 10!"
 accuracy =input("Enter the lowest decimal place of the approximate accuracy: ")
 if (accuracy <= 0):
     while (accuracy <= 0):
@@ -112,8 +115,9 @@ while (comparisonI != comparisonC):
         while (i < (C-1)):
             matrixR[C-1,i+1] = matrixR[C-1,i]
             matrixR[C-1,i+1] += (1./(4.**(i+1)-1.))*(matrixR[C-1,i]-matrixR[C-2,i])
+            matrixE[C-1,i+1] = matrixR[C-1,i+1] - matrixR[C-1,i]
             i = i + 1
-    
+            
 
     """
     #For debug use
@@ -127,30 +131,73 @@ while (comparisonI != comparisonC):
     comparisonI = int(I * (10**(accuracy)) + 0.5 )
     comparisonC = int(CI* (10**(accuracy)) + 0.5 )
     """
+    #Calculation of Error for Romberg
+    
     
     #Romberg's Technique tests
+    """
     if (N>1):
-        comparisonI = int(matrixR[C-1,C-2] * (10**(accuracy+2)))
-        comparisonC = int(matrixR[C-1,C-1] * (10**(accuracy+2)))  
+        comparisonI = int(matrixR[C-1,C-2] * (10**(accuracy)) + 0.5)
+        comparisonC = int(matrixR[C-1,C-1] * (10**(accuracy)) + 0.5) 
+    """
+    if (N>1):
+        comparisonI = int(matrixR[C-1,C-2] * (10**(accuracy)) + 0.5)
+        comparisonC = int((matrixR[C-1,C-2] + matrixE[C-1,C-1]) * (10**(accuracy)) + 0.5)
     
     if (comparisonI != comparisonC):
         N = N * 2
         C = C + 1
+        matrixDummy = np.zeros((1,C))
+        matrixR = np.vstack((matrixR,matrixDummy))
+        matrixE = np.vstack((matrixE,matrixDummy))
+
+        matrixDummy = np.zeros((C+1,1))
+        matrixR = np.hstack((matrixR,matrixDummy))
+        matrixE = np.hstack((matrixE,matrixDummy))
+
     
-print matrixR    
-print "Target accuracy reached at N =", N + 1, "slices."
+#Making the matrix prettier by cropping the unnecessary row and column.
+matrixR = np.delete(matrixR,(C),axis=0)
+matrixR = np.delete(matrixR,(C),axis=1)
+matrixE = np.delete(matrixE,(C),axis=0)
+matrixE = np.delete(matrixE,(C),axis=1)
+
+#printing outputs
+print "Target accuracy reached at N =", N, "slices."
 print 'Rombergs Technique second last term: ', matrixR[C-1,C-2]
 print 'Rombergs Technique last term: ', matrixR[C-1,C-1]
+print 'Estimated error range: ', matrixE[C-1,C-1]
 
-"""
-print 'Error: ', E
-print 'Corrected Integral Result: ', CI
-"""
-"""
-Note:
-N is roughly 1900 - 2000 for 6th decimal place estimation with
-    adaptive trapezoidal rule
-"""
+#Fancy triangular tables
+y_n = "N"
+
+print ' '
+y_n = raw_input("Would you like to see the results in a triangular table? Y or N: ")
+while ((y_n != "Y") and (y_n != "N")):
+    print "Please make sure to enter only 'Y' or 'N' without the quotes!"
+    y_n = raw_input("Would you like to see the results in a triangular table? Y or N: ")
+
+print' '
+if (y_n == 'Y'):
+    print "Romberg's Results: "
+    print matrixR
+print ' '
+
+y_n = "N"
+
+print ' '
+y_n = raw_input("Would you like to see the estimated errors in a triangular table? Y or N: ")
+while ((y_n != "Y") and (y_n != "N")):
+    print "Please make sure to enter only 'Y' or 'N' without the quotes!"
+    y_n = raw_input("Would you like to see the estimated errors in a triangular table? Y or N: ")
+
+#Romberg's Integration Technique by scipy
+print' '
+if (y_n == 'Y'):
+    print "Corresponding Error Estimate: "
+    print matrixE
+
+#Varifying results with scipy's Romberg's integration techniques.
 y_n = "N"
 
 print ' '
@@ -160,5 +207,22 @@ while ((y_n != "Y") and (y_n != "N")):
     y_n = raw_input("Would you like to check it with scipy's Romberg result? Y or N: ")
 
 #Romberg's Integration Technique by scipy
+print' '
 if (y_n == 'Y'):
-    result = integrate.romberg(f, a, b, tol=10**(-accuracy), rtol=10**(-accuracy), show = True)
+    result = integrate.romberg(f, a, b, tol=(1.48e-08), rtol=(1.48e-08), show = True)
+    print ' '
+    print "Author's Note: "
+    print "The scipy Romberg's output accuracy was based on absolute/relative "
+    print "tolerance of 1.48e-08%, hence the different evalutions. Though the "
+    print "calculated values remains similar, if not the same."
+#################
+# Comment:
+# I've been playing around with the scipy's tol (absolute tolerance) and 
+#   rtol (relative tolerance). What I've realized is that these two relies on
+#   the % of the last and second last terms, whereas on the lab assignments it
+#   was stated to find accracy for the error to reach the 6th decimal instead.
+#   Hence different results for different definition of accuracy.
+#
+# I have set the scipy's tol and rtol as the original default %, though the 
+#   boundries will still scale with the initial input for easier comparison.
+##################
